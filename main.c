@@ -9,34 +9,60 @@
 
 
 void clear() {
-    char c;
-    while ((c = getchar() != '\n') && (c != EOF));
+  while (getchar() != '\n');
+  //  char c;
+  //  while ((c = getchar() != '\n') && (c != EOF));
 }
 
+int mainloop(list_t *tree) {
 
-
-int main(void) {
-  // word storage
-  list_t *tree = radix_create_list();
   char choise;
   char name[64];
+  char ch;
+  char *fname = malloc(sizeof(char)*64);
+  char *sname = malloc(sizeof(char)*64);
 
+  node_t *res;
+  int index;
   while(1) {
 	printf("\nActions: (i)mport file, (f)ind word, (p)rint tree, (q)uit\n");
 	choise = (char) getchar();
 	switch (choise) {
 	case 'i': case 'I':
-	  scanf("%64s", name);
-	  //	  printf("strlen %d\n", strlen(name));
-	  char *fname = malloc(sizeof(char)*(strlen(name)));
-	  for (int i = 0; i < strlen(name); i++) {
-		fname[i] = name[i];
+	  //	  scanf("%64s", str);
+	  fname = malloc(sizeof(char)*64);
+	   index = 0;
+	 
+	  while ((ch = getc(stdin)) != EOF) {
+		if (ch == '\n') {
+		  break; 
+		}
+		fname[index] = ch;
+		index++;
 	  }
-	  //	  fname[9] = '\0';
-	  //printf("%s length is %d\n", fname, strlen(fname));
 	  filereader_import(fname, &tree->next);
+	  
+	  free(fname);
+	  free(name);
 	  break;
 	case 'f': case 'F':
+	  while (getchar() != '\n');
+	  for (int j = 0; j < 64; j++) {
+		sname[j] = '\0'; 
+	  }
+	  index = 0;
+	  
+	  while ((ch = getc(stdin)) != '\n') {
+		sname[index] = ch;
+		index++;
+	  }
+	  
+	  res = radix_find(tree->next, sname);
+	  printf("depth: %d and last char: %c", res->depth, res->key);
+	  /*	  for (int i = res->depth-1; i > 0; i--) {
+			  printf("%c", res->key);
+			  res = res->parent;
+			  }*/
 	  break;
 	case 'p': case 'P':
 	  radix_print(tree->next, 0);
@@ -49,11 +75,25 @@ int main(void) {
 	}
 	clear();
   }
-  
-  //  filereader_import("words.txt", tree->next);
 
-  //  radix_print(tree->next, 0);
+}
+
+int main(void) {
+  // word storage
+  list_t *tree = radix_create_list();
+
+  //  mainloop(tree);
   
+  filereader_import("w", &tree->next);
+
+  radix_print(tree->next, 0);
+
+  node_t *res = radix_find(tree->next, "beer");
+  printf("node: %i key: %c\n", res->depth, res->key);
+  res = radix_find(tree->next, "camel");
+  printf("node: %i key: %c\n", res->depth, res->key);
+  res = radix_find(tree->next, "boat");
+  printf("node: %i key: %c\n", res->depth, res->key);
   return 0;
 }
 

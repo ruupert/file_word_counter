@@ -3,7 +3,19 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "radix.h"                                                                                         
+#include "radix.h"
+
+STRREP_INIT;
+char *strrep(const char *str, int nrep)
+{
+    if (nrep <= 0 || !str) return 0;
+    if (strlen(str) * nrep >= STRREP_MAX_CHARS) return 0;
+    memset(__strrep_buffer, 0, STRREP_MAX_CHARS);
+    for (int i = 0; i < nrep; ++i) {
+        strcat(__strrep_buffer, str);
+    }
+    return __strrep_buffer;
+}
 
 
 node_t* radix_create_node(void) {
@@ -53,8 +65,12 @@ node_t* radix_find(node_t *n, char* str) {
 	while(ptr->next != NULL) {
 	  printf("%c == %c\n", ptr->key, str[i]);
 	  if (ptr->key == str[i]) {
-		ptr = ptr->childs;
 		found = 1;
+		if (ptr->depth == len-1) {
+		  return ptr;
+		}
+		
+		ptr = ptr->childs;		
 		break;
 	  } else {
 		ptr = ptr->next;
@@ -115,15 +131,39 @@ void radix_print(node_t *no, int lvl) {
   node_t *ptr = no;
   node_t *tmp;
   while (ptr->next != NULL) {
-	printf(" %c ",  ptr->key);
+	printf("%s%d,%c\n", STRREP(" ", lvl),lvl, ptr->key);
 	if (ptr->childs != NULL) {
+	  tmp = ptr->childs;
+	 		
+	  radix_print(tmp, lvl+1);
+	  
+	  //		printf("\n%s)\n", STRREP(" ", 6*lvl));
+	}
+	
+	ptr = ptr->next;
+  }
+}
+
+void radix_print_arr(node_t *no, int lvl, char* prefix) {
+  node_t *ptr = no;
+  node_t *tmp;
+  while (ptr->next != NULL) {
+	char *str = malloc(sizeof(char)*lvl);
+	for (int i = 0; i < lvl; i++) {
+	  str[i] = prefix[i];
+	}
+	//STRREP(" ", lvl)
+	printf("[%s]%c\n", prefix , ptr->key);
+	str[lvl] = ptr->key;
+	//  	radix_print_arr(ptr->childs, lvl+1, str);
+	/*	if (ptr->childs != NULL) {
 	  tmp = ptr->childs;
 	  if (tmp->key != '\0') {
 		printf(" (" );
 		radix_print(tmp, lvl+1);
 		printf(") ");
 	  }
-	}
+	  }*/
 	ptr = ptr->next;
   }
 }
