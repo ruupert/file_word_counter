@@ -1,5 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
+//#include <wchar.h>
+//#include <locale.h>
+#include <string.h>
 
 #include "filereader.h"
 #include "radix.h"
@@ -24,31 +28,39 @@ static fp_obj_t* filereader_fopen(char* fname) {
   return result;
 }
 
-static int filereader_fread(fp_obj_t* fpr, node_t* tree) {
-  char* buf = malloc(sizeof(char)*128); // BUG HERE: A word can be longer than this... :p
+int filereader_fread(fp_obj_t* fpr, node_t* tree) {
   char c;
-  int i = 0;
+  char* buf = malloc(sizeof(char)*128); // BUG HERE: A word can be longer than this... :p
+  char *ptr = buf;
+  size_t i = 0;
+  printf("filereader enaged\n");
   while ((c = getc(fpr->fp)) != EOF) {
-
+	
+	//printf("chnum: %i, ", (int) c);
 	if (c == '\n') {
-	  char* str = malloc(sizeof(char)*(i));
-
-	  for (size_t j = 0; j < i-1; j++) {
-		str[j] = buf[j];
-	  }
-	  
-	  str[i] = '\0';
-	  free(buf);
-	  char* buf = malloc(sizeof(char)*128);
-	  
-	  radix_insert(tree->next, str);
+	  //printf("fucking linefeed and i count: %zu", i);
+	  char str[i];
+	  //printf("--%s--size: %zu",ptr, sizeof(str));
+	  strlcpy(str, ptr, sizeof(str)+sizeof(char));
+	  //	  str[i] = '\0';
+	  //printf("thefucking string is '%s'", str);
+	  radix_insert(tree, str);
+  	  //radix_print(tree, 0);
 	  i = 0;
-	} else {
-	  buf[i] = c;
+	  //	  free(str);
+	  buf = NULL;
+	  free(buf);
+	  char* buf = malloc(sizeof(char)*128); 
+	  ptr = buf;
+	} else if (c == ' ') {
+	}  else {
+	  //	  printf("fucking char '%c'", c);
+	  ptr[i] = c;
 	  i++;
 	}
-	
+	//printf("\n");
   }
+  
   fclose(fpr->fp);
   return 0;
 }
@@ -65,7 +77,8 @@ char* filereader_stat_str(int num) {
   }
 }
 
-int filereader_import(char* fname, node_t *tree) {
+int filereader_import(char* fname, node_t **tree) {
+  node_t *node = *tree;
   printf("opening file %s\n", fname);
   fp_obj_t *fpr = filereader_fopen(fname);
   if (fpr->status == 1) {
@@ -75,6 +88,6 @@ int filereader_import(char* fname, node_t *tree) {
 	return 1;
   }
 
-  return filereader_fread(fpr, tree);
+  return filereader_fread(fpr, node);
   
 }

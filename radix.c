@@ -68,10 +68,11 @@ node_t* radix_find(node_t *n, char* str) {
 }
 
 
-int radix_insert(node_t *n, char *str) {
+int radix_insert(node_t *n, char* str) {
   node_t *ptr = n;
   node_t *last = NULL; // since we are in the "head"
   int found;
+  //  printf("got a fucking string: '%s'", str);
   for (int i=0; i < strlen(str); i++) {
 	found = 0;
 	//   	printf("%d,%c, ",i, str[i]);

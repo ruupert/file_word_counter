@@ -12,8 +12,8 @@ typedef struct fp_obj {
 
 static fp_obj_t* filereadr_fres(void);
 static fp_obj_t* filereader_fopen(char* fname);
-static int filereader_fread(fp_obj_t* fpr, node_t* tree);
+int filereader_fread(fp_obj_t* fpr, node_t* tree);
 char* filereader_stat_str(int num);
-int filereader_import(char* name, node_t *tree);
+int filereader_import(char* name, node_t **tree);
 
 #endif
