@@ -30,15 +30,18 @@ int main(void) {
   FileSummary_t *nfsum = fsum_create("asdf.txt");
   printf("%s\n", nfsum->fname);
 
+
+  /*
   fp_obj_t *fh_obj_found = filereader_fopen("words.txt");
   printf("file opened: %s\n", filereader_stat_str(fh_obj_found->status));
 
   fp_obj_t *fh_obj_notfound = filereader_fopen("notfound.txt");
   printf("file opened: %s\n", filereader_stat_str(fh_obj_notfound->status));
+  */
+  
+  filereader_import("words.txt", tree->next);
 
+  radix_print(tree->next, 0);
   
-  
-  
-  //  printf("%c%c%c", res->key, res->parent->key, res->parent->parent->key);
   return 0;
 }
